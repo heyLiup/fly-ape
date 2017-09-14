@@ -3,7 +3,7 @@
 #### * 运行 `node app.js` 开启主服务器<br>
 #### * 运行 `lh_app.js` 开启后台服务器<br>
 
-	* [预览](https://heyliup.github.io/fly-ape/fly-ape/public/client/login.html)
+ [预览](https://heyliup.github.io/fly-ape/fly-ape/public/client/login.html)
 
 
 
