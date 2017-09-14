@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>cookie</title>
+	<script src="js/cookiesStore.js"></script>
+</head>
+<body>
+	<script>
+		cookie.setCookie("id","刘鹏","1");
+		cookie.setCookie("id2","刘鹏2","2"); 
+		var result=cookie.getCookie();
+		console.log(result);
+		
+		var keys=[];
+		for(var i in result){
+			keys.push(i);
+		}
+		console.log(keys);
+	</script>
+</body>
+</html>

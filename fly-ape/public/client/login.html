@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>登录</title>
+	<link rel="stylesheet" href="css/login.css">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="component/nav/nav.css">
+	<link rel="stylesheet" href="component/alert/alert.css">
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/vue.js"></script>
+	<script src="js/vue-resource.js"></script>
+	<script src="js/clientStorge.js"></script>
+	<script src="js/vuex.js"></script>
+	<!-- vuex -->
+
+</head>
+<body>
+	<template id="toptitle">
+		<div id="title">
+            <div id="title-content">
+                <div id="title-left">
+                    <span><a href="index.html" id="nav-logo"><img src="images/app_phone.png">拉勾APP</a></span>
+                    <span><a href="index.html" id="nav-a">| &nbsp;进入企业版</a></span>
+                </div>
+            </div>
+	    </div>
+	</template>	
+	<script>
+		var toptitle=Vue.extend({
+			template:"#toptitle",
+			props:["isLogin","usename"],
+		})
+	</script>
+
+	<!-- 加个动画试试 -->
+	<template id="alert">
+		<transition name="fade">
+			<div class="popwindow" v-if="$store.state.alert.alertshow">
+				<div class="alert">
+					<div class="top">
+						<h2>提示</h2>
+						<span @click="$store.commit('alert/cancel')">×</span>
+					</div>
+					<div class="center">
+						<span v-text="$store.state.alert.msg"></span>
+					</div>
+					<div class="bottom" v-if="$store.state.alert.isChoose">
+						<span @click="$store.commit('alert/sure')">确定</span>
+						<span @click="$store.commit('alert/cancel')">取消</span>
+					</div>
+				</div>
+			</div>
+		</transition>
+	</template>
+
+
+	<script>
+		var alert=Vue.extend({
+			template:"#alert",
+			// props:["msg","alertshow"],
+			data:function(){
+				return {
+					isChoose:true,  //需不需要确认取消按钮
+				}
+			},
+			methods:{
+				cancel:function(){
+					this.$emit("cancel");
+					// console.log(this);
+				},
+				sure:function(){
+					this.$emit("sure");
+				}
+			}
+		});	
+	</script>
+	
+	<div id="app">
+		<login></login>
+	</div>
+    <!-- 页头 -->
+    <template id="login">
+		<div class="login">
+			<alert></alert>
+			<toptitle :is-login="isLogin" :usename="usename" @quit="quit"></toptitle>
+				<transition name="fadeLogin">
+					<div class="login-content" v-if="toggle">
+						<ul>
+							<li class="login-logo"><img src="images/lagou.jpg" alt=""></li>
+							<li><h2>使用 FlyApe ID登录官网</h2></li>
+							<li>
+								<label for="" class="icon-user"></label>
+								<input type="text" placeholder="用户名 / 手机号" v-model="usename" 
+								v-on:blur="errMessage[0].isFalse=!errMessage[0].reg.test(usename)">
+								<!-- v-show="errMessage[0].reg.test(usename)" -->
+								<div v-show="errMessage[0].isFalse" v-text="errMessage[0].nameErr" class="errTip"></div>
+								<!-- <err :msg="errMessage[0].nameErr" v-show="true"> --> <!--  错误信息提示 -->
+							</li>
+							<li>
+								<label for="" class="icon-key"></label>
+								<input type="password" v-model="password"
+								v-on:blur="errMessage[1].isFalse=!errMessage[1].reg.test(password)">
+								<div v-show="errMessage[1].isFalse" v-text="errMessage[1].passwordErr" class="errTip"></div>
+							</li>
+
+							<li v-if="isAdmin"><span class="login-btn" @click="send">登录</span></li>
+							<li v-else><span class="adminLogin-btn" @click="send">管理登录</span></li>
+
+							<li><p class="tologin"></p></li>
+							<li class="login-complete">
+								<a href="#" @click="togoAdmin" >管理登录</a>/
+								<a href="#" @click="togoUser" >用户登录</a>  
+								没有账号？ 去<a href="#" @click="change">注册</a></li>
+						</ul>
+					</div>
+				</transition>
+				<transition name="fadeRigist">
+					<div class="regist-content" v-if="!toggle" >
+						<ul>
+							<li class="regist-top">注册 FlyApe ID</li>
+							<li>
+								<label for="" class="icon-user"></label>
+								<input type="text" placeholder="请输入用户名/手机号" v-model="registFileds.registName"
+								v-on:blur="errMessage[2].isFalse=!errMessage[2].reg.test(registFileds.registName)"></li>
+								<div v-show="errMessage[2].isFalse" v-text="errMessage[2].reNameErr" class="errTip"></div>
+							<li>
+								<label for="" class="icon-key"></label>
+								<input type="password" placeholder="密码" v-model="registFileds.registPassword"
+								v-on:blur="errMessage[3].isFalse=!errMessage[3].reg.test(registFileds.registPassword)"></li>
+								<div v-show="errMessage[3].isFalse" v-text="errMessage[3].rePassword" class="errTip"></div>
+							<li>
+								<label for="" class="icon-user"></label>
+								<input type="password" placeholder="确认密码" v-model="registFileds.registRePassword"
+								v-on:blur="errMessage[4].isFalse=!(registFileds.registPassword==registFileds.registRePassword)"></li>
+								<div v-show="errMessage[4].isFalse" v-text="errMessage[4].rerePassword" class="errTip"></div>
+							<li class="regist-code">
+								<label for="" class="icon-phone"></label>
+								<input type="text" placeholder="验证码" v-model="registFileds.inputCode"
+								v-on:blur="errMessage[5].isFalse=!(registFileds.inputCode==code)">
+								<span v-text="code" @click="createCode"></span></li>
+								<div v-show="errMessage[5].isFalse" v-text="errMessage[5].codeErr" class="errTip"></div>
+							<li><span class="regist-btn" @click="registComplete" >提交</span></li>
+							<li><p class="tologin"></p></li>
+							<li class="regist-complete">已有账号？去<a href="#" @click="change">登陆</a></li>
+						</ul>
+					</div>
+				</transition>
+		</div>
+	</template>
+	<!-- 错误信息组件 -->
+	<template id="err">
+		<div class="err">
+			<span v-text="msg"></span>
+		</div>
+	</template>
+
+	<script>
+		var err=Vue.extend({
+			template:"#err",
+			props:["msg"],
+		})
+	</script>
+
+	<script src="js/login.js"></script>
+	<script src="store/alertStore.js"></script>	
+	<script src="store/store.js"></script>
+
+	<script>
+		var vm=new Vue({
+			el:"#app",
+			components:{login:login},
+			store:store
+		})
+	</script>
+</body>
+</html>
